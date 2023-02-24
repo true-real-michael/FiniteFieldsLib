@@ -9,9 +9,9 @@
 using namespace FiniteFields;
 
 TEST(PolynomialOverPrimeFieldSuite, SimpleArithmetic1) {
-    typedef PrimeFieldElement<3> ffp;
-    Polynomial<PrimeFieldElement<3>> a({1, 2, 3, 4, 5});
-    Polynomial<PrimeFieldElement<3>> b({1, 3, 5});
-    Polynomial<PrimeFieldElement<3>> c({1, 2, 2, -1, 5, 2, 1});
+    constexpr PrimeField pf(3);
+    Polynomial<PrimeFieldElement<pf>> a({1, 2, 3, 4, 5});
+    Polynomial<PrimeFieldElement<pf>> b({1, 3, 5});
+    Polynomial<PrimeFieldElement<pf>> c({1, 2, 2, -1, 5, 2, 1});
     ASSERT_EQ(a * b, c);
 }
