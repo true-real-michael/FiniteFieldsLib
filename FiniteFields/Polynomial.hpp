@@ -31,6 +31,7 @@ namespace FiniteFields {
         [[nodiscard]] size_t degree() const { return _coefficients.size(); }
         std::vector<T> AsVector() const { return std::vector<T>(_coefficients); }
 
+        T GetEl(const size_t index) const { return _coefficients[index]; }
         T operator[](const size_t index) const { return _coefficients[index]; }
         T &operator[](const size_t index) { return _coefficients[index]; }
 
@@ -61,28 +62,30 @@ namespace FiniteFields {
 
         size_t dN = degree(), dD = other.degree(), dd, dq = dN - dD, dr = dN - dD;
 
+        std::vector<T> result(_coefficients);
+
         std::vector<T> q(degree() - other.degree() + 1, 0);
         std::vector<T> r(degree() - other.degree() + 1, 0);
         std::vector<T> d(degree() + 1, 0);
 
-        d.resize(dN + 1);
-        q.resize(dq + 1);
-        r.resize(dr + 1);
+        d.assign(dN + 1, 0);
+        q.assign(dq + 1, 0);
+        r.assign(dr + 1, 0);
 
         while (dN >= dD) {
             d.assign(d.size(), 0);
             for (size_t i = 0; i <= dD; i++)
                 d[i + dN - dD] = other[i];
             dd = dN;
-            q[dN - dD] = this[dN] / d[dd];
+            q[dN - dD] = GetEl(dN) / (d[dd]);
             for (size_t i = 0; i < dq + 1; i++)
                 d[i] = d[i] * q[dN - dD];
             for (size_t i = 0; i < dN + 1; i++)
-                this[i] = this[i] - d[i];
+                result[i] = result[i] - d[i];
             dN--;
         }
         for (size_t i = 0; i <= dN; i++)
-            r[i] = this[i];
+            r[i] = result[i];
         return std::make_pair(Polynomial<T>(q).strip(), Polynomial<T>(r).strip());
     }
 
@@ -110,7 +113,7 @@ namespace FiniteFields {
     Polynomial<T> Polynomial<T>::operator*(const T &other) const {
         std::vector<T> result(_coefficients);
         for (auto &it: result) {
-            it *= other;
+            it = it * other;
         }
         return Polynomial<T>(result).strip();
     }
@@ -119,9 +122,12 @@ namespace FiniteFields {
     Polynomial<T> Polynomial<T>::operator+(const Polynomial &other) const {
         size_t size1 = degree(), size2 = other.degree();
         size_t resSize = std::max(size1, size2);
-        std::vector<T> result(resSize);
+        std::vector<T> result(resSize, 0);
         for (size_t i = 0; i < resSize; i++) {
-            result[i] = (i < size1 ? this[i] : 0) + (i < size2 ? other[i] : 0);  // WARN: potential substitution error
+            if (i < size1)
+                result[i] = result[i] + _coefficients[i];
+            if (i < size2)
+                result[i] = result[i] + other[i];
         }
         return Polynomial(result).strip();
     }

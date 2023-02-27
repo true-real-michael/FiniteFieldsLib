@@ -21,10 +21,12 @@ namespace FiniteFields {
         }
     public:
         PrimeFieldElement(int val);
+        PrimeFieldElement(const PrimeFieldElement& other);
 
         [[nodiscard]] size_t GetVal() const { return _val; }
         void SetVal(size_t newVal) { _val = normalize(newVal); }
 
+        PrimeFieldElement<pf> &operator=(const PrimeFieldElement<pf> &other) { _val = other.GetVal(); return *this; }
         bool operator==(const PrimeFieldElement<pf> &other) const { return _val == other.GetVal(); }
         PrimeFieldElement<pf> pow(size_t power) const;
         PrimeFieldElement<pf> inv() const;
@@ -33,13 +35,18 @@ namespace FiniteFields {
         PrimeFieldElement<pf> operator-(const PrimeFieldElement<pf> &other) const;
         PrimeFieldElement<pf> operator/(const PrimeFieldElement<pf> &other) const;
         PrimeFieldElement<pf> operator-() const;
-        PrimeFieldElement<pf> &operator*=(const PrimeFieldElement<pf> &other) const { this = this * other; return this; }
-        PrimeFieldElement<pf> &operator+=(const PrimeFieldElement<pf> &other) const { this = this + other; return this; }
-        PrimeFieldElement<pf> &operator-=(const PrimeFieldElement<pf> &other) const { this = this - other; return this; }
-        PrimeFieldElement<pf> &operator/=(const PrimeFieldElement<pf> &other) const { this = this / other; return this; }
+//        PrimeFieldElement<pf> &operator*=(const PrimeFieldElement<pf> &other) const { this->_val *= other; return *this; }
+//        PrimeFieldElement<pf> &operator+=(const PrimeFieldElement<pf> &other) const { *this = *this + other; return *this; }
+//        PrimeFieldElement<pf> &operator-=(const PrimeFieldElement<pf> &other) const { *this = *this - other; return *this; }
+//        PrimeFieldElement<pf> &operator/=(const PrimeFieldElement<pf> &other) const { *this = *this / other; return *this; }
 
 
     };
+
+    template<PrimeField pf>
+    PrimeFieldElement<pf>::PrimeFieldElement(const PrimeFieldElement &other) {
+        _val = other.GetVal();
+    }
 
     template<PrimeField pf>
     PrimeFieldElement<pf>::PrimeFieldElement(int val) : _val(normalize(val)){
