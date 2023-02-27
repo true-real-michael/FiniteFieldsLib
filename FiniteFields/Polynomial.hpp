@@ -52,7 +52,12 @@ namespace FiniteFields {
 
     template<class T>
     bool Polynomial<T>::operator==(const Polynomial &other) const {
-        return AsVector() == other.AsVector();
+        if (degree() != other.degree())
+            return false;
+        for (size_t i = 0; i < degree(); i++)
+            if (_coefficients[i] != other.GetEl(i))
+                return false;
+        return true;
     }
 
     template<class T>
