@@ -9,4 +9,6 @@ target_link_libraries(FiniteFields_run FiniteFields)
 include_directories(FiniteFields)
 add_subdirectory(FiniteFields)
 
-add_subdirectory(gtest)
+if (CMAKE_TESTING_ENABLED)
+    add_subdirectory(gtest)
+endif()
