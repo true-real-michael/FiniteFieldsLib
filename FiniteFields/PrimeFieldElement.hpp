@@ -6,64 +6,69 @@
 #define FINITEFIELDS_PRIMEFIELDELEMENT_H
 
 #include <iostream>
+#include "PrimeField.h"
 
 namespace FiniteFields {
 
-    template<size_t p>
-    class PrimeFieldElement {
-    private:
+    template<PrimeField pf>
+    class PrimeFieldElement{
         int _val;
-
-    public:
-        PrimeFieldElement(int val) : _val{normalize(val)} {
-            std::vector<bool> erathosphene(p + 2, true);
-            erathosphene[0] = false;
-            erathosphene[1] = false;
-            for (size_t i = 2; i * i <= p; i++)
-                if (erathosphene[i])
-                    for (size_t j = i * i; j <= p; j += i)
-                        erathosphene[j] = false;
-
-            if (!erathosphene[p])
-                throw std::invalid_argument("Parameter p has to be prime.");
-        }
 
     private:
         [[nodiscard]] int normalize(int x) const {
-            int r = p;
-            return x >= 0 ? x % r : r + x % r; // SUPER WEIRD error occurs when `p` is used instead of `r`
+            int p = pf.p;
+            return x >= 0 ? x % p : p + x % p;
         }
-
     public:
+        PrimeFieldElement(int val);
+        PrimeFieldElement(const PrimeFieldElement& other);
+
         [[nodiscard]] size_t GetVal() const { return _val; }
         void SetVal(size_t newVal) { _val = normalize(newVal); }
 
-        bool operator==(const PrimeFieldElement<p> &other) const { return _val == other.GetVal(); }
-        PrimeFieldElement<p> pow(size_t power) const;
-        PrimeFieldElement<p> inv() const;
-        PrimeFieldElement<p> operator*(const PrimeFieldElement<p> &other) const;
-        PrimeFieldElement<p> operator*=(const PrimeFieldElement<p> &other) const { this = this * other; }
-        PrimeFieldElement<p> operator+(const PrimeFieldElement<p> &other) const;
-        PrimeFieldElement<p> operator+=(const PrimeFieldElement<p> &other) const { this = this + other; }
-        PrimeFieldElement<p> operator-(const PrimeFieldElement<p> &other) const;
-        PrimeFieldElement<p> operator-=(const PrimeFieldElement<p> &other) const { this = this - other; }
-        PrimeFieldElement<p> operator/(const PrimeFieldElement<p> &other) const;
-        PrimeFieldElement<p> operator/=(const PrimeFieldElement<p> &other) const { this = this / other; }
-        PrimeFieldElement<p> operator-() const;
+        PrimeFieldElement<pf> &operator=(const PrimeFieldElement<pf> &other) { _val = other.GetVal(); return *this; }
+        bool operator==(const PrimeFieldElement<pf> &other) const { return _val == other.GetVal(); }
+        PrimeFieldElement<pf> pow(size_t power) const;
+        PrimeFieldElement<pf> inv() const;
+        PrimeFieldElement<pf> operator*(const PrimeFieldElement<pf> &other) const;
+        PrimeFieldElement<pf> operator+(const PrimeFieldElement<pf> &other) const;
+        PrimeFieldElement<pf> operator-(const PrimeFieldElement<pf> &other) const;
+        PrimeFieldElement<pf> operator/(const PrimeFieldElement<pf> &other) const;
+        PrimeFieldElement<pf> operator-() const;
     };
 
-    template<size_t p>
-    PrimeFieldElement<p> PrimeFieldElement<p>::operator/(const PrimeFieldElement<p> &other) const {
+    template<PrimeField pf>
+    PrimeFieldElement<pf>::PrimeFieldElement(const PrimeFieldElement &other) {
+        _val = other.GetVal();
+    }
+
+    template<PrimeField pf>
+    PrimeFieldElement<pf>::PrimeFieldElement(int val) : _val(normalize(val)){
+        std::vector<bool> erathosphene(pf.p + 2, true);
+        erathosphene[0] = false;
+        erathosphene[1] = false;
+        for (size_t i = 2; i * i <= pf.p; i++)
+            if (erathosphene[i])
+                for (size_t j = i * i; j <= pf.p; j += i)
+                    erathosphene[j] = false;
+
+        if (!erathosphene[pf.p])
+            throw std::invalid_argument("Parameter p has to be prime.");
+    }
+
+
+    template<PrimeField pf>
+    PrimeFieldElement<pf> PrimeFieldElement<pf>::operator/(const PrimeFieldElement<pf> &other) const {
         return *this * other.inv();
     }
 
-    template<size_t p>
-    PrimeFieldElement<p> PrimeFieldElement<p>::inv() const {
-        return pow(p - 2);
+    template<PrimeField pf>
+    PrimeFieldElement<pf> PrimeFieldElement<pf>::inv() const {
+        return pow(pf.p - 2);
     }
 
-    template<size_t p>
-    PrimeFieldElement<p> PrimeFieldElement<p>::pow(size_t power) const {
+    template<PrimeField pf>
+    PrimeFieldElement<pf> PrimeFieldElement<pf>::pow(size_t power) const {
         size_t base = _val;
         size_t res = 1;
         while (power) {
@@ -75,32 +80,32 @@ namespace FiniteFields {
                 power--;
             }
         }
-        return PrimeFieldElement<p>(res);
+        return PrimeFieldElement<pf>(res);
     }
 
-    template<size_t p>
-    PrimeFieldElement<p> PrimeFieldElement<p>::operator-() const {
-        return PrimeFieldElement<p>(-_val);
+    template<PrimeField pf>
+    PrimeFieldElement<pf> PrimeFieldElement<pf>::operator-() const {
+        return PrimeFieldElement<pf>(-_val);
     }
 
-    template<size_t p>
-    PrimeFieldElement<p> PrimeFieldElement<p>::operator-(const PrimeFieldElement<p> &other) const {
-        return PrimeFieldElement<p>(_val - other.GetVal());
+    template<PrimeField pf>
+    PrimeFieldElement<pf> PrimeFieldElement<pf>::operator-(const PrimeFieldElement<pf> &other) const {
+        return PrimeFieldElement<pf>(_val - other.GetVal());
     }
 
-    template<size_t p>
-    PrimeFieldElement<p> PrimeFieldElement<p>::operator+(const PrimeFieldElement<p> &other) const {
-        return PrimeFieldElement<p>(_val + other.GetVal());
+    template<PrimeField pf>
+    PrimeFieldElement<pf> PrimeFieldElement<pf>::operator+(const PrimeFieldElement<pf> &other) const {
+        return PrimeFieldElement<pf>(_val + other.GetVal());
     }
 
-    template<size_t p>
-    PrimeFieldElement<p> PrimeFieldElement<p>::operator*(const PrimeFieldElement<p> &other) const {
-        return PrimeFieldElement<p>(_val * other.GetVal());
+    template<PrimeField pf>
+    PrimeFieldElement<pf> PrimeFieldElement<pf>::operator*(const PrimeFieldElement<pf> &other) const {
+        return PrimeFieldElement<pf>(_val * other.GetVal());
     }
 
-    template<size_t p>
-    std::ostream &operator<<(std::ostream &os, PrimeFieldElement<p> ffe) {
-        os << ffe.GetVal()<<"+("<<p<<')';
+    template<PrimeField pf>
+    std::ostream &operator<<(std::ostream &os, PrimeFieldElement<pf> pfe) {
+        os << pfe.GetVal()<<"+("<<pf.p<<')';
         return os;
     }
 

@@ -8,29 +8,31 @@
 using namespace FiniteFields;
 
 TEST(PrimeFieldElementSuite, PrimeBase) {
-    EXPECT_NO_THROW({ PrimeFieldElement<2> a(0); });
-    EXPECT_NO_THROW({ PrimeFieldElement<3> b(1); });
-    EXPECT_NO_THROW({ PrimeFieldElement<5> c(2); });
-    EXPECT_NO_THROW({ PrimeFieldElement<7> d(-1); });
-    EXPECT_NO_THROW({ PrimeFieldElement<11> e(4); });
-    EXPECT_NO_THROW({ PrimeFieldElement<13> f(4); });
+    EXPECT_NO_THROW({ PrimeFieldElement<PrimeField(5)> a(0); });
+    EXPECT_NO_THROW({ PrimeFieldElement<PrimeField(3)> b(1); });
+    EXPECT_NO_THROW({ PrimeFieldElement<PrimeField(5)> c(2); });
+    EXPECT_NO_THROW({ PrimeFieldElement<PrimeField(7)> d(-1); });
+    EXPECT_NO_THROW({ PrimeFieldElement<PrimeField(11)> e(4); });
+    EXPECT_NO_THROW({ PrimeFieldElement<PrimeField(13)> f(4); });
 }
 
 TEST(PrimeFieldElementSuite, NonPrimeBase) {
-    EXPECT_ANY_THROW({ PrimeFieldElement<4> a(0); });
-    EXPECT_ANY_THROW({ PrimeFieldElement<6> b(1); });
-    EXPECT_ANY_THROW({ PrimeFieldElement<9> c(2); });
-    EXPECT_ANY_THROW({ PrimeFieldElement<10> d(-1); });
-    EXPECT_ANY_THROW({ PrimeFieldElement<12> e(4); });
-    EXPECT_ANY_THROW({ PrimeFieldElement<15> f(4); });
+    EXPECT_ANY_THROW({ PrimeFieldElement<PrimeField(4)> a(0); });
+    EXPECT_ANY_THROW({ PrimeFieldElement<PrimeField(6)> b(1); });
+    EXPECT_ANY_THROW({ PrimeFieldElement<PrimeField(9)> c(2); });
+    EXPECT_ANY_THROW({ PrimeFieldElement<PrimeField(10)> d(-1); });
+    EXPECT_ANY_THROW({ PrimeFieldElement<PrimeField(12)> e(4); });
+    EXPECT_ANY_THROW({ PrimeFieldElement<PrimeField(15)> f(4); });
 }
 
 TEST(PrimeFieldElementSuite, SimpleArithmetic1) {
-    PrimeFieldElement<5> a(0);
-    PrimeFieldElement<5> b(1);
-    PrimeFieldElement<5> c(2);
-    PrimeFieldElement<5> d(-1);
-    PrimeFieldElement<5> e(4);
+    constexpr PrimeField pf(5);
+
+    PrimeFieldElement<pf> a(0);
+    PrimeFieldElement<pf> b(1);
+    PrimeFieldElement<pf> c(2);
+    PrimeFieldElement<pf> d(-1);
+    PrimeFieldElement<pf> e(4);
 
     ASSERT_EQ(b - b, a);
     ASSERT_EQ(b + b, c);
@@ -38,8 +40,10 @@ TEST(PrimeFieldElementSuite, SimpleArithmetic1) {
 }
 
 TEST(PrimeFieldElementSuite, SimpleArithmetic2) {
-    ASSERT_EQ(PrimeFieldElement<5>(2) * PrimeFieldElement<5>(4), PrimeFieldElement<5>(8));
-    ASSERT_EQ(PrimeFieldElement<5>(2).inv(), PrimeFieldElement<5>(3));
-    ASSERT_EQ(PrimeFieldElement<5>(3) / PrimeFieldElement<5>(4), PrimeFieldElement<5>(12));
-    ASSERT_EQ(PrimeFieldElement<5>(2).pow(4), PrimeFieldElement<5>(16));
+    constexpr PrimeField pf(5);
+
+    ASSERT_EQ(PrimeFieldElement<pf>(2) * PrimeFieldElement<pf>(4), PrimeFieldElement<pf>(8));
+    ASSERT_EQ(PrimeFieldElement<pf>(2).inv(), PrimeFieldElement<pf>(3));
+    ASSERT_EQ(PrimeFieldElement<pf>(3) / PrimeFieldElement<pf>(4), PrimeFieldElement<pf>(12));
+    ASSERT_EQ(PrimeFieldElement<pf>(2).pow(4), PrimeFieldElement<pf>(16));
 }
