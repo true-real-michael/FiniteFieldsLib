@@ -35,12 +35,6 @@ namespace FiniteFields {
         PrimeFieldElement<pf> operator-(const PrimeFieldElement<pf> &other) const;
         PrimeFieldElement<pf> operator/(const PrimeFieldElement<pf> &other) const;
         PrimeFieldElement<pf> operator-() const;
-//        PrimeFieldElement<pf> &operator*=(const PrimeFieldElement<pf> &other) const { this->_val *= other; return *this; }
-//        PrimeFieldElement<pf> &operator+=(const PrimeFieldElement<pf> &other) const { *this = *this + other; return *this; }
-//        PrimeFieldElement<pf> &operator-=(const PrimeFieldElement<pf> &other) const { *this = *this - other; return *this; }
-//        PrimeFieldElement<pf> &operator/=(const PrimeFieldElement<pf> &other) const { *this = *this / other; return *this; }
-
-
     };
 
     template<PrimeField pf>
