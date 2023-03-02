@@ -8,3 +8,5 @@ add_executable(Google_Tests_run ${testSRC})
 
 target_link_libraries(Google_Tests_run FiniteFields)
 target_link_libraries(Google_Tests_run gtest gtest_main)
+
+add_test(gTests_run Google_Tests_run)
