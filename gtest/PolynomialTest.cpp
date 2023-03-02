@@ -24,7 +24,7 @@ TEST(PolynomialOverPrimeFieldSuite, SimpleArithmetic1) {
 TEST(PolynomialOverPrimeFieldSuite, LongDivision) {
     Polynomial<int> a({2, 0, 6, 0, 1});
     Polynomial<int> b({5, 0, 1});
-    Polynomial<int> c({1, 1});
+    Polynomial<int> c({1, 0, 1});
     Polynomial<int> d({-3});
 
     ASSERT_EQ(a / b, c);

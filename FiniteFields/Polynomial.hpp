@@ -16,16 +16,17 @@ namespace FiniteFields {
 
     public:
         constexpr explicit Polynomial(const std::vector<T> &coefficients) :
-                _coefficients{coefficients} {}
+                _coefficients{coefficients} { stripCoefficients(); }
 
         constexpr explicit Polynomial(std::vector<T> &&coefficients) :
-                _coefficients{coefficients} {}
+                _coefficients{coefficients} { stripCoefficients(); }
 
         Polynomial(const Polynomial<T> &other) = default;
 
     private:
         std::pair<Polynomial<T>, Polynomial<T>> divmod(const Polynomial<T> &other) const;
-        Polynomial<T> strip();
+        void stripCoefficients();
+        Polynomial<T> stripped();
 
     public:
         [[nodiscard]] size_t degree() const { return _coefficients.size(); }
@@ -51,6 +52,12 @@ namespace FiniteFields {
     };
 
     template<class T>
+    void Polynomial<T>::stripCoefficients() {
+        while(_coefficients.size() > 1 && *_coefficients.rbegin() == 0)
+            _coefficients.pop_back();
+    }
+
+    template<class T>
     bool Polynomial<T>::operator==(const Polynomial &other) const {
         if (degree() != other.degree())
             return false;
@@ -60,42 +67,50 @@ namespace FiniteFields {
         return true;
     }
 
+
     template<class T>
-    std::pair<Polynomial<T>, Polynomial<T>> Polynomial<T>::divmod(const Polynomial<T> &other) const {
-        if (degree() < other.degree())
-            return std::make_pair(Polynomial<T>({0}), Polynomial<T>(*this));
+    size_t vecDegree(std::vector<T> &vec) {
+        while (!vec.empty() && *vec.rbegin() == 0)
+            vec.pop_back();
+        if (vec.empty())
+            vec.emplace_back(0);
+        return vec.size() - 1;
+    }
 
-        size_t dN = degree(), dD = other.degree(), dd, dq = dN - dD, dr = dN - dD;
 
-        std::vector<T> result(_coefficients);
+    template<class T>
+    std::pair<Polynomial<T>, Polynomial<T>> Polynomial<T>::divmod(const Polynomial<T> &otherP) const {
+        std::vector<T> tthis(AsVector());
+        std::vector<T> other(otherP.AsVector());
+        size_t degOther = vecDegree(other);
+        size_t degThis = vecDegree(tthis);
 
-        std::vector<T> q(degree() - other.degree() + 1, 0);
-        std::vector<T> r(degree() - other.degree() + 1, 0);
-        std::vector<T> d(degree() + 1, 0);
+        if (degree() < otherP.degree())
+            return std::make_pair(Polynomial<T>({0}), Polynomial<T>(tthis));
 
-        d.assign(dN + 1, 0);
-        q.assign(dq + 1, 0);
-        r.assign(dr + 1, 0);
+        std::vector<T> remainder(tthis);
+        std::vector<T> quotient(degThis, 0);
+        while (degThis >= degOther) {
+            std::vector<T> d(degThis+1, 0);
+            for (int i = 0; i <= degThis; i++)
+                d[degThis - degOther + i] = other[i];
 
-        while (dN >= dD) {
-            d.assign(d.size(), 0);
-            for (size_t i = 0; i <= dD; i++)
-                d[i + dN - dD] = other[i];
-            dd = dN;
-            q[dN - dD] = GetEl(dN) / (d[dd]);
-            for (size_t i = 0; i < dq + 1; i++)
-                d[i] = d[i] * q[dN - dD];
-            for (size_t i = 0; i < dN + 1; i++)
-                result[i] = result[i] - d[i];
-            dN--;
+            T mult = *remainder.rbegin() / *d.rbegin();
+            quotient[degThis - degOther] = mult;
+
+            for (int i = 0; i <= degThis; i++)
+                d[i] = d[i] * mult;
+
+            for (int i = 0; i <= degThis; i++) {
+                remainder[i] = remainder[i] - d[i];
+            }
+            degThis = vecDegree(remainder);
         }
-        for (size_t i = 0; i <= dN; i++)
-            r[i] = result[i];
-        return std::make_pair(Polynomial<T>(q).strip(), Polynomial<T>(r).strip());
+        return {Polynomial<T>(quotient), Polynomial<T>(remainder)};
     }
 
     template<class T>
-    Polynomial<T> Polynomial<T>::strip() {
+    Polynomial<T> Polynomial<T>::stripped() {
         std::vector<T> result(_coefficients);
         while (result.size() > 1 && *result.rbegin() == T(0)) {
             result.pop_back();
@@ -111,7 +126,7 @@ namespace FiniteFields {
                 result[iThis + iOther] = result[iThis + iOther] + _coefficients[iThis] * other[iOther];  // WARN: potential substitution error
             }
         }
-        return Polynomial<T>(result).strip();
+        return Polynomial<T>(result).stripped();
     }
 
     template<class T>
@@ -120,7 +135,7 @@ namespace FiniteFields {
         for (auto &it: result) {
             it = it * other;
         }
-        return Polynomial<T>(result).strip();
+        return Polynomial<T>(result).stripped();
     }
 
     template<class T>
@@ -134,7 +149,7 @@ namespace FiniteFields {
             if (i < size2)
                 result[i] = result[i] + other[i];
         }
-        return Polynomial(result).strip();
+        return Polynomial(result).stripped();
     }
 
     template<class T>
