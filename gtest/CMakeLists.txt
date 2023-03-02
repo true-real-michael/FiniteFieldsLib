@@ -1,6 +1,6 @@
 project(Google_tests)
 
-add_subdirectory(lib)
+#add_subdirectory(lib)
 
 file(GLOB testSRC "*.cpp")
 add_executable(Google_Tests_run ${testSRC})
