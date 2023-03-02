@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 project(FiniteFields_main)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -9,6 +9,5 @@ target_link_libraries(FiniteFields_run FiniteFields)
 include_directories(FiniteFields)
 add_subdirectory(FiniteFields)
 
-if (CMAKE_TESTING_ENABLED)
-    add_subdirectory(gtest)
-endif()
+enable_testing()
+add_subdirectory(gtest)
